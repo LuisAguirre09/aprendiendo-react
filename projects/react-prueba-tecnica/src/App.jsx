@@ -1,23 +1,10 @@
 import { useEffect, useState } from "react"
 import './App.css'
-import { getRandomFact } from "./services/facts.js";
 import { useCatImage } from "./hooks/useCatimage.js";
+import { useCatFact } from "./hooks/useCatFact.js";
 
 
 const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
-
-const useCatFact = () => {
-    const [fact, setFact] = useState()
-
-    const refreshFact = () => {
-        getRandomFact().then(newFact => setFact(newFact))
-    }
-
-    // Para recuperar la cita al cargar la pagina
-    useEffect(refreshFact, [])
-
-    return { fact, refreshFact }
-}
 
 export function App() {
     // const [fact, setFact] = useState();
