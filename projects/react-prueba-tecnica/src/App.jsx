@@ -1,45 +1,37 @@
 import { useEffect, useState } from "react"
 import './App.css'
+import { getRandomFact } from "./services/facts.js";
+import { useCatImage } from "./hooks/useCatimage.js";
 
-const CAT_ENDPOINT_RANDOM_FACT = 'https://catfact.ninja/fact';
-// const CAT_ENDPOINT_IMAGE_URL = `https://cataas.com/cat/says/${firstWord}?fontSize=50&fontColor=red&json=true`;
+
 const CAT_PREFIX_IMAGE_URL = 'https://cataas.com'
 
-export function App() {
-    const [fact, setFact] = useState();
-    const [imageUrl, setImageUrl] = useState();
+const useCatFact = () => {
+    const [fact, setFact] = useState()
+
+    const refreshFact = () => {
+        getRandomFact().then(newFact => setFact(newFact))
+    }
 
     // Para recuperar la cita al cargar la pagina
-    useEffect(() =>{
-        fetch(CAT_ENDPOINT_RANDOM_FACT)
-        .then(res => res.json())
-        .then(data => {
-            const { fact } = data
-            setFact(data.fact)
+    useEffect(refreshFact, [])
 
-           
-            });
-    }, [])
+    return { fact, refreshFact }
+}
 
-    // para recuperar la imagen cada vez que tenemos una cita nueva
-    useEffect(() => {
-        if(!fact) return
-        const threeFirstWords = fact.split(' ', 3).join(' ')
-        console.log(threeFirstWords);
+export function App() {
+    // const [fact, setFact] = useState();
+    const { fact, refreshFact} = useCatFact()
+    const { imageUrl } = useCatImage({ fact })
 
-        fetch(`https://cataas.com/cat/says/${threeFirstWords}?fontSize=50&fontColor=red&json=true`)
-            .then(res => res.json()
-            .then(response => {
-                const { url } = response
-                setImageUrl(url)
-                // console.log(response)
-            }))
-    }, [fact])
-
+    const handleClick = async () => {
+        refreshFact()
+    }
 
     return (
         <main>
             <h1>App de gatitos</h1>
+            <button onClick={handleClick}>Get new fact</button>
             <section>
                 {fact && <p>{fact}</p>}
                 {imageUrl && <img src={`${imageUrl}`} alt={`Image extrated using the firts three words ${fact}`} />}
