@@ -1,37 +1,46 @@
 import './App.css'
-import responseMovies from './mocks/with-results.json'
-import withoutResults from './mocks/no-results.json'
 import { Movies } from './components/Movies';
+import { useMovies } from './hooks/useMovies';
+import { useEffect, useRef, useState } from 'react';
 
-export function useMovies() {
-  const movies = responseMovies.Search; 
-
-  const mappedMovies = movies?.map(movie => ({
-      id: movie.imdbID,
-      title: movie.Title,
-      year: movie.Year,
-      poster: movie.Poster
-  }))
-
-  return { movies: mappedMovies }
-}
 
 function App() {
 
-  const { movies: mappedMovies } = useMovies()
+  const { movies } = useMovies()
+  const inputRef = useRef()
+  const [query, setQuery] = useState('')
+  const (error, setError) = useState(null)
+
+  console.log('render');
+
+  const handleSubmit = (event) => {
+      event.preventDefault()
+      // const { query } = Object.fromEntries(new window.FormData(event.target))
+      console.log({query})
+  }
+
+  const handleChange = (event) => {
+    setQuery(event.target.value)
+  }
+
+  useEffect(() => {
+    if(query === ''){
+        setError('No se puede buscar un pelicula vacia')
+    }
+  }, [search])
 
   return (
     <div className='page'>
       <header>
           <h1>Buscador de peliculas</h1>
-          <form className='form'>
-            <input type="text" placeholder='Superman, Spider - Man, ' />
+          <form className='form' onSubmit={handleSubmit}>
+            <input onChange={handleChange} value={query} name='query' type="text" placeholder='Superman, Spider - Man, ' />
             <button type='submit'>Burcar</button>
           </form>
       </header>
 
       <main>
-        <Movies movies={mappedMovies} />
+        <Movies movies={movies} />
       </main>
     </div>
   )
